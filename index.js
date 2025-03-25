@@ -126,20 +126,38 @@ async function run() {
       res.json(result);
     });
 
-    // update cart item
-    // app.put('/cart/:id', async (req, res) => {
-    //   const id = req.params.id;
-    //   const cartUpadte = req.body;
-    //   console.log(cartUpadte);
-    //   const query = { _id: new ObjectId(id) };
-    //   const updateDoc = {
-    //     $set: {
-    //       quantity: req.body.quantity,
-    //     },
-    //   };
-    //   const result = await client.db("Content").collection("cart").updateOne(query, updateDoc);
-    //   res.json(result);
-    // });
+    // orders API
+
+    // Get all orders
+    app.get("/orders", async (req, res) => {
+      const orders = await client.db("Content").collection("orders").find({}).toArray();
+      res.json(orders);
+    });
+
+    // Add order
+    app.post("/orders", async (req, res) => {
+      const order = req.body;
+      const result = await client.db("Content").collection("orders").insertOne(order);
+      res.json(result);
+    });
+
+    // Delete order
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await client.db("Content").collection("orders").deleteOne(query);
+      res.json(result);
+    });
+
+    // Update order status
+    app.patch("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const status = req.body.status;
+      const query = { _id: new ObjectId(id) };
+      const update = { $set: { status: status } };
+      const result = await client.db("Content").collection("orders").updateOne(query, update);
+      res.json(result);
+    });
 
     // promo code API
 
@@ -157,15 +175,32 @@ async function run() {
     app.post("/promo-codes", async (req, res) => {
       try {
         const promoCode = req.body;
-        if (!promoCode.code || !promoCode.discountPercent) {
-          return res.status(400).json({ error: "Missing required fields" });
-        }
+    
+        // if (!promoCode.code || !promoCode.discountPercent) {
+        //   return res.status(400).json({ error: "Missing required fields" });
+        // }
+    
         const result = await client.db("Content").collection("promo-codes").insertOne(promoCode);
         res.json(result);
       } catch (error) {
         res.status(500).json({ error: "Failed to add promo code" });
       }
     });
+    
+
+    // Delete promo code
+    app.delete("/promo-codes/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const result = await client.db("Content").collection("promo-codes").deleteOne(query);
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ error: "Failed to delete promo code" });
+      }
+    });
+
+
 
     // Ad banner API
     app.get("/ad-banner", async (req, res) => {

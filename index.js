@@ -41,21 +41,13 @@ async function run() {
 
     // Slider data API
     app.get("/slider", async (req, res) => {
-      const slider = await client
-        .db("Content")
-        .collection("slider-data")
-        .find({})
-        .toArray();
+      const slider = await client.db("Content").collection("slider-data").find({}).toArray();
       res.json(slider);
     });
 
     // All products API
     app.get("/products", async (req, res) => {
-      const products = await client
-        .db("Content")
-        .collection("all-products")
-        .find({})
-        .toArray();
+      const products = await client.db("Content").collection("all-products").find({}).toArray();
       res.json(products);
     });
 
@@ -63,10 +55,7 @@ async function run() {
     app.get("/products/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }; // ObjectId is now defined
-      const product = await client
-        .db("Content")
-        .collection("all-products")
-        .findOne(query);
+      const product = await client.db("Content").collection("all-products").findOne(query);
       res.json(product);
     });
 
@@ -74,21 +63,14 @@ async function run() {
 
     // Get all cart items
     app.get("/cart", async (req, res) => {
-      const cart = await client
-        .db("Content")
-        .collection("cart")
-        .find({})
-        .toArray();
+      const cart = await client.db("Content").collection("cart").find({}).toArray();
       res.json(cart);
     });
 
     // Add item to cart
     app.post("/cart", async (req, res) => {
       const cartItem = req.body;
-      const result = await client
-        .db("Content")
-        .collection("cart")
-        .insertOne(cartItem);
+      const result = await client.db("Content").collection("cart").insertOne(cartItem);
       res.json(result);
     });
 
@@ -101,10 +83,7 @@ async function run() {
       }
 
       try {
-        const product = await client
-          .db("Content")
-          .collection("cart")
-          .findOne({ _id: new ObjectId(id) });
+        const product = await client.db("Content").collection("cart").findOne({ _id: new ObjectId(id) });
 
         if (!product) {
           return res.status(404).json({ message: "Product not found in cart" });
@@ -115,10 +94,7 @@ async function run() {
 
         if (newQuantity < 1) {
           // Delete the product from the cart
-          await client
-            .db("Content")
-            .collection("cart")
-            .deleteOne({ _id: new ObjectId(id) });
+          await client.db("Content").collection("cart").deleteOne({ _id: new ObjectId(id) });
           return res.status(200).json({ message: "Product removed from cart" });
         }
 
@@ -126,10 +102,7 @@ async function run() {
         const newTotalPrice = newQuantity * product.price;
 
         // Update in database
-        await client
-          .db("Content")
-          .collection("cart")
-          .updateOne(
+        await client.db("Content").collection("cart").updateOne(
             { _id: new ObjectId(id) },
             { $set: { quantity: newQuantity, totalPrice: newTotalPrice } }
           );
@@ -149,10 +122,7 @@ async function run() {
     app.delete("/cart/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const result = await client
-        .db("Content")
-        .collection("cart")
-        .deleteOne(query);
+      const result = await client.db("Content").collection("cart").deleteOne(query);
       res.json(result);
     });
 
@@ -176,11 +146,7 @@ async function run() {
     // Get all promo codes
     app.get("/promo-codes", async (req, res) => {
       try {
-        const promoCodes = await client
-          .db("Content")
-          .collection("promo-codes")
-          .find({})
-          .toArray();
+        const promoCodes = await client.db("Content").collection("promo-codes").find({}).toArray();
         res.json(promoCodes);
       } catch (error) {
         res.status(500).json({ error: "Failed to fetch promo codes" });
@@ -194,10 +160,7 @@ async function run() {
         if (!promoCode.code || !promoCode.discountPercent) {
           return res.status(400).json({ error: "Missing required fields" });
         }
-        const result = await client
-          .db("Content")
-          .collection("promo-codes")
-          .insertOne(promoCode);
+        const result = await client.db("Content").collection("promo-codes").insertOne(promoCode);
         res.json(result);
       } catch (error) {
         res.status(500).json({ error: "Failed to add promo code" });
@@ -206,21 +169,13 @@ async function run() {
 
     // Ad banner API
     app.get("/ad-banner", async (req, res) => {
-      const adBanner = await client
-        .db("Content")
-        .collection("ad-bennar")
-        .find({})
-        .toArray();
+      const adBanner = await client.db("Content").collection("ad-bennar").find({}).toArray();
       res.json(adBanner);
     });
 
     // Testimonials API
     app.get("/testimonials", async (req, res) => {
-      const testimonials = await client
-        .db("Content")
-        .collection("testimonials")
-        .find({})
-        .toArray();
+      const testimonials = await client.db("Content").collection("testimonials").find({}).toArray();
       res.json(testimonials);
     });
   } finally {
@@ -234,6 +189,6 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.listen(port, "192.168.198.174", () => {
+app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
